@@ -32,6 +32,16 @@ Aplikasi ini memanfaatkan Generative AI sebagai asisten pemrograman dalam proses
 - `screenshots/` — dokumentasi gambar
 - `proposal.pdf` — proposal tugas (ditambahkan nanti)
 
-## Status
+## Screenshots
 
-Hari 1: Inisialisasi repository dan struktur awal.
+### Prompt & Output AI
+
+- `screenshots/prompts/` — dokumentasi prompt dan output Generative AI
+
+### Bug & Perbaikan
+
+- `screenshots/bugs/` — bukti bug yang ditemukan dan perbaikannya
+
+### Pengujian End-to-End
+
+- `screenshots/testing/` — hasil uji manual 8 skenario (Hari 4)
