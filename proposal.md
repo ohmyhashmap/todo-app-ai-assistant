@@ -85,7 +85,7 @@ todo-app-ai-assistant/
 
 ## Bab 3 — Proses Penggunaan Generative AI
 
-Proses pengembangan dilakukan melalui **empat iterasi** dengan AI, masing-masing menghasilkan pelajaran berbeda tentang kekuatan dan keterbatasan AI sebagai asisten pemrograman.
+Proses pengembangan dilakukan melalui **tiga iterasi** dengan AI, masing-masing menghasilkan pelajaran berbeda tentang kekuatan dan keterbatasan AI sebagai asisten pemrograman.
 
 ### 3.1 Iterasi 1 — Rancangan Awal
 
@@ -105,20 +105,24 @@ Prompt dan output iterasi ini tersimpan di:
 Prompt kedua meminta **kode lengkap** untuk ketiga file, dengan penekanan pada penanganan `localStorage` kosong dan pemisahan file yang rapi.
 
 - `screenshots/prompts/03-iterasi2-prompt.png` — prompt kedua
-- `screenshots/prompts/04-iterasi2-output.png` — output AI (kode lengkap)
+- `screenshots/prompts/04-iterasi2-output.png` sampai `06-iterasi2-output.png` — output AI (kode lengkap; di-screenshot dalam tiga bagian karena panjang)
 
 **Evaluasi.** Struktur dan fitur sesuai permintaan. AI menyertakan `JSON.parse(localStorage.getItem('todos')) || []` sebagai penanganan `localStorage` kosong. Namun — seperti dijelaskan di Bab 3.4 — solusi ini **tidak cukup aman** untuk data korup. AI juga memakai `Date.now()` sebagai ID tugas, yang berisiko duplikat jika dua tugas ditambahkan pada milidetik yang sama (kemungkinan kecil, tapi patut dicatat).
 
 **Keputusan.** Kode diadopsi, tetapi dengan dua perbaikan: (1) pembungkusan `JSON.parse` dengan `try/catch` (lihat Bab 3.4, Bug #1); (2) konfirmasi hapus dengan jumlah (lihat Bab 3.5).
 
-### 3.3 Iterasi 3 — Penyempurnaan UI
+### 3.3 Iterasi 3 — Fitur Hapus Semua Selesai dan Penyempurnaan UI
 
-Setelah aplikasi berjalan, ditambahkan **empty state** dan **counter tugas tersisa** sebagai keputusan desain **di luar instruksi AI** (tidak melalui prompt). Penambahan ini dilakukan secara manual karena berdampak langsung pada kegunaan: pengguna perlu tahu status daftar tanpa harus menghitung sendiri.
+Prompt ketiga meminta AI menambahkan **satu fitur kecil**: tombol "Hapus Semua Selesai" untuk menghapus semua tugas berstatus `completed`, dengan syarat hanya mengirim diff/potongan kode (bukan file utuh), tidak mengubah struktur file, tidak mengubah fitur lain, tombol harus `disabled` saat tidak ada tugas selesai, dan ada konfirmasi sebelum hapus.
 
-- `screenshots/prompts/05-iterasi3-prompt.png` — prompt iterasi ketiga
-- `screenshots/prompts/06-iterasi3-output.png` — output
+- `screenshots/prompts/07-iterasi3-prompt.png` — prompt iterasi ketiga
+- `screenshots/prompts/08-iterasi3-output.png` sampai `09-iterasi3-output.png` — output AI (di-screenshot dalam dua bagian)
 
-Integrasi manual ini justru **memunculkan bug baru** (Bug #2), yang menunjukkan bahwa kerja sama manusia–AI tidak otomatis aman. Detailnya dibahas di Bab 3.4.
+**Evaluasi.** AI mengikuti seluruh instruksi eksplisit: mengirim diff (bukan file utuh), menyertakan `disabled` awal di HTML, memperbarui `disabled` secara dinamis via `todos.some(...)`, dan memakai `confirm()` sebelum eksekusi. Satu catatan kecil: pesan konfirmasi masih generik ("Apakah Anda yakin...") tanpa menyebut jumlah tugas yang akan dihapus — kurang informatif.
+
+**Keputusan.** Kode AI diadopsi. Selain itu, ditambahkan **empty state** dan **counter tugas tersisa** secara manual sebagai keputusan desain di luar prompt — keduanya berdampak langsung pada kegunaan, meski tidak diminta AI.
+
+Integrasi manual ini justru **memunculkan bug baru** (Bug #2 dan Bug #3), yang menunjukkan bahwa kerja sama manusia–AI tidak otomatis aman. Detailnya dibahas di Bab 3.4.
 
 ### 3.4 Contoh Evaluasi Kritis — Tiga Bug dan Perbaikannya
 
@@ -241,7 +245,7 @@ Aplikasi web To-Do List sederhana berhasil dikembangkan menggunakan HTML, CSS, d
 Pengalaman ini memberikan tiga pelajaran utama:
 
 1. **AI mempercepat *boilerplate*, tetapi bukan pengganti verifikasi.** Iterasi 2 menghasilkan kode yang 90% langsung bisa dipakai, tetapi penanganan `localStorage` korup — yang krusial untuk ketahanan aplikasi — tetap terlewat.
-2. **AI tidak selalu menuruti instruksi detail.** Pada Iterasi 3, prompt meminta "tombol harus disabled saat tidak ada tugas selesai"; AI menyertakan `disabled` awal di HTML tetapi tidak selalu memperbarui statusnya secara dinamis. Pengembang perlu membaca output secara kritis.
+2. **AI mengikuti instruksi teknis dengan baik, tetapi kurang peka terhadap UX.** Pada Iterasi 3, AI memenuhi semua syarat teknis (diff, `disabled` dinamis, konfirmasi), tetapi pesan konfirmasi yang dihasilkan masih generik tanpa menyebut jumlah tugas yang akan dihapus. Pengembang perlu menambahkan detail kecil seperti ini secara manual.
 3. **Integrasi manusia–AI juga sumber bug.** Bug #2 dan #3 bukan berasal dari AI, melainkan dari penempatan kode yang kurang tepat saat mengintegrasikan fitur tambahan. Ini menegaskan bahwa tanggung jawab akhir tetap pada pengembang.
 
 ### 5.3 Saran Pengembangan
@@ -257,7 +261,7 @@ Pengalaman ini memberikan tiga pelajaran utama:
 ## Lampiran
 
 - **`prompt-log.md`** — log lengkap prompt, output AI, evaluasi, bug, dan perbaikan.
-- **`screenshots/prompts/`** — dokumentasi visual prompt dan output AI (Iterasi 1–4).
+- **`screenshots/prompts/`** — dokumentasi visual prompt dan output AI (Iterasi 1–3, total 9 gambar termasuk lanjutan output iterasi 2 dan 3).
 - **`screenshots/bugs/`** — bukti kondisi bug sebelum perbaikan dan setelah perbaikan (3 bug, 6 gambar).
 - **`screenshots/testing/`** — hasil uji end-to-end 8 skenario (10 gambar, termasuk sebelum/sesudah untuk skenario 7 dan 8).
 - **`README.md`** — deskripsi singkat repository.
