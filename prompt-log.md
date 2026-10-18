@@ -67,4 +67,51 @@ Dokumen ini mencatat proses penggunaan Generative AI dalam pengembangan aplikasi
     localStorage.removeItem('todos');
   }
 
+## Catatan 3
 
+- Tanggal: 10/11/2026
+- Tujuan: Menambahkan fitur "Hapus Semua Selesai" sebagai iterasi kedua dan 
+  merapikan tampilan (empty state + counter tugas).
+
+- Prompt: (lihat screenshots/prompt-hari3.png)
+  Prompt meminta AI hanya mengirim diff/potongan kode yang berubah, tidak 
+  mengubah struktur file, tidak mengubah fitur lain, tombol harus disabled 
+  saat tidak ada tugas selesai, dan ada konfirmasi sebelum hapus.
+
+- Output AI (ringkas):
+  AI memberikan potongan kode untuk index.html, style.css, dan app.js sesuai 
+  format yang diminta (diff, bukan file utuh). Tombol "Hapus Semua Selesai" 
+  ditambahkan dengan atribut `disabled` awal di HTML, dan diperbarui secara 
+  dinamis di `renderTodos()` menggunakan `todos.some(todo => todo.completed)`. 
+  Event listener memakai `confirm()` sebelum mengeksekusi `.filter()` untuk 
+  menyisakan tugas yang belum selesai.
+
+- Evaluasi:
+  AI kali ini mengikuti seluruh instruksi eksplisit, termasuk yang biasanya 
+  terlewat (disabled state). Format output juga sesuai permintaan (hanya diff). 
+  Dua catatan kecil:
+  1. Pesan konfirmasi masih generik ("Apakah Anda yakin...") tanpa jumlah 
+     tugas yang akan dihapus — kurang informatif.
+  2. Empty state dan counter tugas tidak termasuk dalam output, karena memang 
+     tidak diminta di prompt. Bagian ini saya tambahkan sendiri sebagai 
+     keputusan desain.
+
+- Bug/Masalah:
+  Saat mengintegrasikan kode AI dengan empty state manual saya, muncul bug 
+  baru: karena empty state diletakkan sebelum update `clearCompletedBtn.disabled` 
+  dan diakhiri dengan `return`, baris update disabled terlewat setiap kali 
+  daftar kosong, sehingga tombol tetap disabled meski status berubah.
+
+- Perbaikan:
+  1. Menghapus `return` pada blok empty state dan mengubah struktur menjadi 
+     `if/else` agar bagian akhir `renderTodos()` (counter dan disabled) 
+     selalu dieksekusi.
+  2. Menambahkan hitungan pada pesan konfirmasi: 
+     `Hapus ${count} tugas yang sudah selesai?`.
+
+- Alasan keputusan:
+  Integrasi manual dengan kode AI tidak otomatis aman — perlu dibaca dan 
+  dipahami alurnya. Bug `return` di atas adalah contoh nyata bahwa AI tidak 
+  bisa disalahkan sepenuhnya; kesalahan justru terjadi saat saya menempelkan 
+  kode tambahan tanpa memeriksa konsekuensi terhadap alur fungsi yang dibuat AI. 
+  Konfirmasi dengan jumlah membuat pengguna tahu persis dampak tindakannya.
