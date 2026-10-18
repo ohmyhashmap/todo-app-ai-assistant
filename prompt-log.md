@@ -36,3 +36,35 @@ Dokumen ini mencatat proses penggunaan Generative AI dalam pengembangan aplikasi
 
 - Alasan keputusan:
   Saya memilih versi sederhana karena lebih sesuai dengan batas waktu 1 minggu, lebih mudah diuji, dan lebih mudah dijelaskan dalam proposal. Saya juga mencatat saran AI yang tidak dipakai sebagai bukti evaluasi kritis terhadap output AI.
+
+## Catatan 2
+
+- Tanggal: 10/11/2026
+- Tujuan: Meminta kode lengkap aplikasi To-Do List (HTML, CSS, JS vanilla) dengan 6 fitur wajib dan penanganan localStorage kosong.
+- Prompt: (lihat screenshots/Hari 1.3.png)
+
+- Output AI (ringkas):
+  AI memberikan kode lengkap untuk index.html, style.css, dan app.js. Struktur sudah dipisah 3 file. Fitur tambah, toggle selesai, hapus, dan filter sudah diimplementasikan. Penanganan localStorage kosong sudah disertakan melalui `JSON.parse(localStorage.getItem('todos')) || []`. AI juga memberikan penjelasan singkat per bagian kode.
+
+- Evaluasi:
+  Secara umum output AI sudah sesuai instruksi dan langsung bisa dijalankan untuk 6 skenario uji utama. Namun ada 2 celah:
+  1. `JSON.parse` tidak dibungkus `try/catch`, sehingga jika isi localStorage korup (bukan JSON valid), aplikasi crash sebelum operator `||` sempat dievaluasi.
+  2. `Date.now()` sebagai ID berisiko duplikat jika dua tugas ditambahkan dalam milidetik yang sama — kecil kemungkinan, tapi tetap patut dicatat.
+
+- Bug/Masalah:
+  Setelah menjalankan `localStorage.setItem('todos', 'data-rusak')` di console lalu me-refresh halaman, muncul error `Uncaught SyntaxError: Unexpected token 'd', "data-rusak" is not valid JSON`, dan daftar tugas tidak dapat dirender. (screenshots/bug-hari2.png)
+
+- Perbaikan:
+  Membungkus pembacaan data dengan try/catch:
+
+  ```js
+
+  let todos;
+  try {
+    todos = JSON.parse(localStorage.getItem('todos')) || [];
+  } catch (e) {
+    todos = [];
+    localStorage.removeItem('todos');
+  }
+
+
